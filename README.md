@@ -20,6 +20,65 @@ It is designed for research papers and academic documents where preserving forma
 
 This beta supports focused plain-text edits and the tested workflows described below. Complex equations, fields, mixed-format targets and other unsupported content require manual review; see **Compatibility and limits**.
 
+## Install with a Codex prompt
+
+Copy the prompt below into a **local Codex chat on the Windows computer where Word is installed**. It uses the GitHub marketplace option and asks Codex to check dependencies before claiming success. Normal installer, account, permission and restart steps may still need your input.
+
+```text
+Install the Word Desktop plugin from https://github.com/rayx1/codex-word-desktop
+on this Windows computer, and check everything needed to use it.
+
+1. Read the repository README, marketplace catalog, plugin manifests and launch
+   scripts before running them. Preserve my existing Codex settings and plugins.
+   Check for an existing Word Desktop connection and avoid installing duplicates.
+
+2. Check Windows-native execution, the same signed-in desktop account as Word,
+   licensed desktop Microsoft Word, Windows PowerShell 5.1 with STA support,
+   Python 3.10+ available as python on Codex's PATH, Git, and Codex CLI support
+   for plugin marketplaces. Check that Poppler's pdfinfo and pdftoppm run.
+   Reuse a working existing or Codex-bundled Poppler before adding a dependency.
+   Word COM registration alone does not prove activation or a live connection.
+
+3. Install only missing free prerequisites from official vendor or maintainer
+   sources using the README setup instructions and normal approval controls.
+   Do not replace working installations or overwrite PATH entries. If Word
+   installation/activation, sign-in, administrator approval or a policy blocks
+   setup, finish the independent checks and tell me the exact step I must do.
+   Do not purchase Office, change Office security or bypass access restrictions.
+   No LibreOffice or additional AI API key is needed.
+
+4. Register and install the repository plugin using the supported CLI:
+   codex plugin marketplace add rayx1/codex-word-desktop --ref main
+   codex plugin add word-desktop@word-desktop-github --json
+   If that marketplace is already registered, verify its source is this exact
+   repository and refresh it rather than adding a conflicting registration.
+   Locate the installed plugin directory from the installation output.
+
+5. Run the installed diagnose.ps1 using Windows PowerShell:
+   powershell.exe -NoProfile -STA -ExecutionPolicy RemoteSigned -File "<installedPath>\diagnose.ps1" -Json
+   Use the real installedPath. Review each check and fix supported failures.
+   Check the account/session: a sandbox or service-account COM failure does
+   not mean Word is missing. Use an approved interactive-user execution path,
+   or give me the exact diagnostic command to run in my normal desktop terminal.
+   Respect Group Policy and required signing/download approvals.
+
+6. Have me open Word normally and resolve any Office dialogs if necessary.
+   Reload the plugin or tell me to restart Codex/start a fresh local chat if
+   the tools are not available yet. Once available, call the plugin's
+   connection_status tool and report the actual Word version/build.
+   Do not read, edit or close any of my documents during setup.
+   Do not terminate Word or launch background Word automation.
+
+7. Report separately: dependency checks, plugin installation, tool discovery
+   and live Word connection. Mark anything untested or blocked accurately.
+   Do not call the connection verified just because installation succeeded.
+   If a new chat is required, give me this follow-up prompt:
+   "Use Word Desktop to check connection_status and report the Word version.
+   Do not read or edit any documents."
+```
+
+This is a setup prompt, not a standalone installer or a guarantee that every client supports the same installation controls. The manual ZIP and GitHub options below remain available.
+
 ## Download and verify
 
 For ZIP import, [download the repository](https://github.com/rayx1/codex-word-desktop/archive/refs/heads/main.zip), extract it and package only `plugins/word-desktop` as explained in option 1. Review its `plugin.json`, MIT license and third-party notices before installation. For the GitHub marketplace option, Codex downloads the repository through the commands in option 2. After either installation, run the setup/connection checks below; downloading or importing a package alone does not verify Word access.
