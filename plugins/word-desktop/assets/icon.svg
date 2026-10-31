@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Word Desktop document verification icon">
+<rect width="512" height="512" rx="112" fill="#17324d"/>
+<path d="M134 86H294L378 170V404H134Z" fill="#fff"/>
+<path d="M294 86V170H378" fill="#d9e9ef"/>
+<path d="M178 220H326M178 260H288M178 300H250" fill="none" stroke="#17324d" stroke-width="16" stroke-linecap="round"/>
+<circle cx="344" cy="358" r="86" fill="#087f8c" stroke="#17324d" stroke-width="12"/>
+<path d="M302 358L331 386L387 330" fill="none" stroke="#fff" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

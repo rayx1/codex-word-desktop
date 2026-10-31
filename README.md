@@ -3,20 +3,40 @@
 **Developer:** Rashmiranjan Behera · **Website:** [rbehera.in](https://rbehera.in)  
 **Version:** 0.1.1 beta · **License:** [MIT](LICENSE)
 
-This repository contains the **plugin ZIP, installation instructions, license notices and checksum only**. The development repository, separate source archive, research files, test outputs and demo materials are not published here. The plugin ZIP necessarily includes the scripts/configuration that run it.
+This repository contains the **runnable plugin folder, installation instructions and license notices only**. Research files, test outputs and development/demo materials are excluded. The scripts needed to run the plugin are in [`plugins/word-desktop`](plugins/word-desktop).
+
+## Plugin description
+
+Word Desktop connects Codex on your Windows computer to your installed Microsoft Word. It lets Codex identify and read a selected open document, revise a working copy, insert native reviewer comments, make genuine tracked replacements, save the copy and export it to PDF using Word. A separate Poppler renderer creates page images for Codex to inspect.
+
+It is designed for research papers and academic documents where preserving formatting, reviewing changes and checking the final page layout matter. It requires a running desktop Word session under your Windows account; no LibreOffice or additional AI API key is needed.
+
+## What it solves
+
+- **A dependable connection to desktop Word:** Codex can work with the exact document you select, including its main text, headings and tables, through a focused set of document tools.
+- **Safer revisions:** edits target working copies, leaving original files protected by default. Stale document state and ambiguous passages are rejected before editing.
+- **Review inside Word:** ordinary replacements, native comments and genuine tracked changes are distinct operations, so reviewers can see what was changed.
+- **Layout verification beyond text:** Word exports the PDF, then Poppler renders ordered page images. Codex can inspect those images for clipping, missing content, broken tables and page-break problems. Text extraction alone does not verify layout.
+
+This beta supports focused plain-text edits and the tested workflows described below. Complex equations, fields, mixed-format targets and other unsupported content require manual review; see **Compatibility and limits**.
 
 ## Download and verify
 
-[Download word-desktop-0.1.1.zip](https://github.com/rayx1/codex-word-desktop/raw/refs/heads/main/word-desktop-0.1.1.zip). Compare its hash with [SHA256SUMS.txt](SHA256SUMS.txt):
+For ZIP import, [download the repository](https://github.com/rayx1/codex-word-desktop/archive/refs/heads/main.zip), extract it and package only `plugins/word-desktop` as explained in option 1. Review its `plugin.json`, MIT license and third-party notices before installation. For the GitHub marketplace option, Codex downloads the repository through the commands in option 2. After either installation, run the setup/connection checks below; downloading or importing a package alone does not verify Word access.
 
-```powershell
-Get-FileHash -LiteralPath .\word-desktop-0.1.1.zip -Algorithm SHA256
-```
+## Choose an installation option
+
+| Option | Use it when | Updates |
+| --- | --- | --- |
+| **1. ZIP import in Codex desktop** | You prefer the app's **New Plugin** upload dialog. | Make a new plugin ZIP and use the app's update/reimport flow. |
+| **2. GitHub marketplace** | You prefer installing and refreshing from this repository. | Refresh the marketplace, then restart Codex. |
+
+Choose one option. Both use the same plugin and require the software below. A ZIP import does not establish GitHub synchronization. No prebuilt ZIP is stored in this repository.
 
 ## Requirements
 
 - Windows and a licensed, working desktop Microsoft Word installation.
-- Codex desktop/CLI supporting local plugin marketplaces.
+- Codex desktop with plugin archive upload (option 1), or a Codex client supporting Git marketplaces (option 2).
 - Windows PowerShell 5.1 (`powershell.exe`, included with Windows).
 - Python 3.10+, available as `python` on the PATH seen by Codex.
 - Poppler's `pdfinfo` and `pdftoppm` on PATH, or an available Codex-bundled copy. **Poppler is not bundled in this ZIP.**
@@ -33,7 +53,7 @@ Install the **Windows desktop version** of Word using your existing Microsoft 36
 
 ### 2. Codex desktop and its CLI
 
-Install/update the Windows desktop app using [OpenAI's Windows setup page](https://learn.chatgpt.com/docs/windows/windows-app), then sign in and open Codex. Select the **Windows native** agent environment. Open a fresh PowerShell terminal and check:
+Install/update the Windows desktop app using [OpenAI's Windows setup page](https://learn.chatgpt.com/docs/windows/windows-app), then sign in and open Codex. Select the **Windows native** agent environment. **Option 1 does not require Codex CLI commands.** For option 2, open a fresh PowerShell terminal and check:
 
 ```powershell
 codex --version
@@ -73,7 +93,7 @@ pdfinfo -v
 pdftoppm -v
 ```
 
-If these are missing, the plugin's diagnostic can still find an existing Codex-bundled Poppler. Extract the plugin and run step 2 under **Install** before installing another copy. Skip installation if the diagnostic reports both tools as available.
+If these are missing, the plugin's diagnostic can still find an existing Codex-bundled Poppler. Download/extract the repository and run the check under **Verify setup and connection** before installing another copy. Skip installation if the diagnostic reports both tools as available.
 
 If neither source works, one maintained Windows x64 route is [Miniforge from conda-forge](https://github.com/conda-forge/miniforge). Download its Windows x86_64 installer, follow its installation prompts and keep the Start menu shortcut. Open **Miniforge Prompt**, then run:
 
@@ -87,39 +107,61 @@ An existing conda installation can run the same install command. The [conda-forg
 
 Poppler is external GPL-licensed software, supplied separately from this MIT-licensed plugin. It is **not included** in the plugin ZIP. Consult its exact build's license/dependency notices. Miniforge installation and this alternative Poppler build were documented from their maintainers' instructions; the tested renderer used the existing Codex-bundled Poppler 26.07.0.
 
-## Install
+## Option 1: ZIP import in Codex desktop
 
-Use a regular terminal under the **same signed-in Windows account as Word**. Do not run as a service, sandbox account, another user or an elevated administrator.
+1. Select **Code → Download ZIP** on this repository, or [download the repository](https://github.com/rayx1/codex-word-desktop/archive/refs/heads/main.zip), then extract it.
+2. Find `plugins/word-desktop` inside the extracted repository. Create a ZIP of **that plugin folder's contents**, including `.codex-plugin` and `.mcp.json`. The plugin ZIP must contain `plugin.json`, `mcp.json`, `server.ps1`, `skills/` and the other runtime files directly at its root (one enclosing plugin folder is also supported). Do not upload the complete repository ZIP: it contains the marketplace and extra files.
 
-1. Download the ZIP into your current directory and extract it to a permanent location:
-
-   ```powershell
-   $pluginFolder = Join-Path $env:LOCALAPPDATA 'CodexPlugins\WordDesktop-0.1.1'
-   Expand-Archive -LiteralPath .\word-desktop-0.1.1.zip -DestinationPath $pluginFolder
-   ```
-
-   The extracted folder must directly contain `plugin.json`, `mcp.json`, `server.ps1`, `diagnose.ps1` and `.agents`. Do not extract over an existing installation. Keep the extracted folder so the local marketplace remains available.
-
-2. Open Word normally and resolve any Office dialogs, then check setup:
+   To package all files, including hidden ones, open PowerShell in the extracted repository root and run:
 
    ```powershell
-   powershell.exe -NoProfile -STA -ExecutionPolicy RemoteSigned -File "$pluginFolder\diagnose.ps1"
+   Add-Type -AssemblyName System.IO.Compression.FileSystem
+   $pluginFolder = (Resolve-Path -LiteralPath '.\plugins\word-desktop').Path
+   $zipPath = Join-Path (Split-Path -Parent $pluginFolder) 'word-desktop-0.1.1.zip'
+   [IO.Compression.ZipFile]::CreateFromDirectory($pluginFolder, $zipPath)
    ```
 
-   Fix FAIL items. Closed Word is a WARN: prerequisites may pass while the live Word connection is unverified. The diagnostic never launches Word or reads document contents. `RemoteSigned` applies only to that PowerShell process; no persistent Windows/Office setting is changed. Group Policy still applies. If signing/download approval is required, follow the normal approval process; do not bypass it.
+   This writes the ZIP beside the plugin folder and refuses to overwrite an existing ZIP. The archive does not include the repository marketplace.
 
-3. Register the marketplace included in the ZIP, then install:
+3. In Codex desktop, open **Plugins → New Plugin** (the create/add control's label may vary), select **click to upload**, choose the plugin ZIP and select **Add plugin**. Review any permissions and setup messages. If your client has no archive upload, use option 2.
+4. Start a new local chat and follow **Verify setup and connection** below. An upload success does not establish that the local MCP server started.
 
-   ```powershell
-   codex plugin marketplace add "$pluginFolder"
-   codex plugin add word-desktop@word-desktop-local
-   ```
+For updates, create a ZIP from the newer plugin folder and use the app's supported update/reimport control. If only **New Plugin** is available, remove the previous installation before adding the new one; keep your documents/work outputs. Avoid duplicate Word Desktop connections.
 
-   You can instead register the marketplace with the first command, restart the desktop app, open **Plugins**, choose the **Word Desktop Local** source, open **Word Desktop** and select **Install**. Review the connection permissions. This is a local installation; do not search for a public directory listing. This GitHub repository holds a ZIP, so register the **extracted folder**, not `rayx1/codex-word-desktop` as a Git marketplace.
+**Validation status:** the archive-upload dialog was confirmed in the developer's Codex desktop screenshot. Acceptance of this local MCP package and startup through that dialog have not yet been tested; report any import diagnostics accurately. The repository/CLI route is available separately.
 
-   Keep only one Word Desktop connection. Intentionally remove/disable an older plugin or direct MCP registration before switching; keep its saved documents.
+## Option 2: install from the GitHub marketplace
 
-4. Restart Codex or start a fresh **local** chat. Ask: **Use Word Desktop to check the connection and list open documents. Do not edit anything.** Verify the actual Word version and full document path. Installation alone does not verify the connection. The helper attaches to Word already running under your desktop account.
+Use a regular terminal under the **same signed-in Windows account as Word**. Do not run as a service, sandbox account, another user or an elevated administrator. Git must be available (`git --version`); if missing, install [Git for Windows](https://git-scm.com/downloads/win) and reopen the terminal.
+
+```powershell
+codex plugin marketplace add rayx1/codex-word-desktop --ref main
+codex plugin add word-desktop@word-desktop-github
+```
+
+Alternatively, run the first command, restart the desktop app, open **Plugins**, choose the **Word Desktop GitHub** source, open **Word Desktop** and select **Install**. Review the connection permissions. Then restart Codex and verify the connection below.
+
+To fetch later repository changes:
+
+```powershell
+codex plugin marketplace upgrade word-desktop-github
+```
+
+Restart Codex and check the plugin version. Marketplace refresh is not continuous live synchronization. Follow any update prompt; if the client retains an older installation, reinstall from the refreshed marketplace and verify the reported version. [Official marketplace setup and refresh instructions](https://developers.openai.com/plugins/build/plugins).
+
+Keep only one Word Desktop connection. Before switching options, intentionally remove/disable the previous plugin or direct MCP registration; retain saved documents. An earlier extracted-folder installation may use the marketplace name `word-desktop-local`.
+
+## Verify setup and connection
+
+Open Word normally under the same signed-in Windows account as Codex, and resolve Office dialogs. If you downloaded the repository, set `$pluginFolder` to its `plugins/word-desktop` directory and run:
+
+```powershell
+powershell.exe -NoProfile -STA -ExecutionPolicy RemoteSigned -File "$pluginFolder\diagnose.ps1"
+```
+
+Fix FAIL items. Closed Word is a WARN: prerequisites may pass while the live Word connection is unverified. The diagnostic never launches Word or reads document contents. Its Codex CLI check applies to option 2; a missing CLI alone does not establish that desktop ZIP import is unavailable. `RemoteSigned` applies only to that PowerShell process; no persistent Windows/Office setting is changed. Group Policy still applies. If signing/download approval is required, follow the normal approval process; do not bypass it.
+
+In a fresh **local** Codex chat, ask: **Use Word Desktop to check the connection and list open documents. Do not edit anything.** Confirm that the tools are present and verify the actual Word version and full document path. The helper attaches to Word already running under your desktop account. Installation alone does not verify the connection.
 
 ## Workflow and protection
 
@@ -134,6 +176,8 @@ Outputs remain in `%LOCALAPPDATA%\CodexWord\work` until manually removed. Reques
 ## Compatibility and limits
 
 The disposable sample was tested with Word 16.0.17932 (WINWORD.EXE 16.0.17932.21056), Windows PowerShell 5.1 and Poppler 26.07.0. Comments, genuine tracked replacements, working-copy preservation, Word PDF export and inspection of both sample pages were verified. The 0.1.1 setup checks, renderer regression and MCP initialization were also tested.
+
+The folder distribution was checked with an isolated Codex CLI home: marketplace registration, plugin installation and the 10-tool MCP handshake passed. The documented ZIP command produced a valid 14-file archive, including the hidden compatibility files and excluding the marketplace. These checks do not establish successful desktop ZIP import or live Word access through a new installation.
 
 This is a beta, not certification for all Word builds or research papers. Scope: one registered Word instance, main-story text/headings/table cells, unique plain-text anchors up to 250 characters. Mixed-format targets, fields, equations and existing revisions are not edited. Structured header/footnote/text-box extraction, accepting/rejecting revisions and PDF markup export are not implemented. Long papers and complex tables require their own verification.
 
@@ -150,13 +194,13 @@ Diagnostic JSON (`diagnose.ps1 -Json`) may include account names/local paths; re
 
 ## Shutdown and removal
 
-Disconnecting the helper leaves Word and its documents open. To uninstall:
+Disconnecting the helper leaves Word and its documents open. For option 1, remove Word Desktop using the desktop app's plugin management controls. For option 2:
 
 ```powershell
-codex plugin remove word-desktop@word-desktop-local
-codex plugin marketplace remove word-desktop-local
+codex plugin remove word-desktop@word-desktop-github
+codex plugin marketplace remove word-desktop-github
 ```
 
-Restart Codex. Save needed documents before manually removing the extracted folder or work outputs. No Office add-in, service, scheduled task or firewall rule needs removal.
+For a legacy extracted-folder installation, use `word-desktop@word-desktop-local` and `word-desktop-local` instead. Restart Codex. Save needed documents before manually removing a downloaded folder or work outputs. No Office add-in, service, scheduled task or firewall rule needs removal.
 
 GitHub distribution is separate from OpenAI's public Plugin Directory. No directory approval or Microsoft/OpenAI affiliation is claimed.

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "word-desktop": {
+      "type": "stdio",
+      "command": "powershell.exe",
+      "args": ["-NoLogo", "-NoProfile", "-STA", "-ExecutionPolicy", "RemoteSigned", "-File", "${PLUGIN_ROOT}/server.ps1"],
+      "cwd": "${PLUGIN_ROOT}"
+    }
+  }
+}

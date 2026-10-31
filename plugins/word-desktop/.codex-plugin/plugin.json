@@ -1,0 +1,89 @@
+{
+  "name": "word-desktop",
+  "version": "0.1.1",
+  "description": "Control selected Windows Word documents and visually verify Word-exported PDFs.",
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "requires_local_executor": true,
+  "interface": {
+    "displayName": "Word Desktop",
+    "category": "Productivity",
+    "capabilities": [
+      "Read selected Word documents",
+      "Edit working copies",
+      "Native comments and tracked changes",
+      "Verify Word-exported pages"
+    ],
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/icon.png",
+    "shortDescription": "Edit and verify documents with Microsoft Word",
+    "longDescription": "Windows desktop Word integration with protected working copies, native comments and tracked changes, Word PDF export and separate Poppler page rendering. No AI API key required.",
+    "developerName": "Rashmiranjan Behera",
+    "websiteURL": "https://rbehera.in"
+  },
+  "license": "MIT",
+  "extensions": {
+    "com.openai": {
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Identify and read a disposable academic sample while a second document is open.",
+              "prompt": "List open Word documents. Select the review sample by its exact full path, then read its main text, headings and table. Do not read the other document.",
+              "tools_triggered": "list_documents, select_document, read_document",
+              "expected_behavior": "Return distinct document IDs and full paths, select only the intended sample, and return its heading levels and all sample table cells. No content is modified."
+            },
+            {
+              "description": "Create a working copy and make an ordinary edit while preserving surrounding formatting.",
+              "prompt": "Make a new review copy of the selected saved sample. Replace a small improvement with a clear improvement in ordinary mode, then save the copy.",
+              "tools_triggered": "read_document, save_copy, replace_passage, save_document",
+              "expected_behavior": "Use the new copy ID and current state tokens. Original file bytes and original open identity remain unchanged. Replacement retains bold, unrelated italic text remains, and no revisions are created."
+            },
+            {
+              "description": "Insert a native reviewer comment on a unique passage in the working copy.",
+              "prompt": "In the selected working copy, add the reviewer comment Please verify the confidence interval. to a clear improvement and save it.",
+              "tools_triggered": "read_document, add_comment, save_document",
+              "expected_behavior": "Add one native Word comment with the current Office author identity, anchored to the requested exact text. Save the working copy and leave the original untouched."
+            },
+            {
+              "description": "Make a genuine tracked replacement after a comment has been inserted.",
+              "prompt": "In the working copy, replace preliminary result with provisional result using genuine tracked changes. Save it and report the observed revision counts.",
+              "tools_triggered": "read_document, replace_passage, save_document",
+              "expected_behavior": "Word's native revision count increases and the saved DOCX contains insertion/deletion markup. The visible sentence remains exactly The provisional result needs independent replication. Ordinary edits are not described as tracked changes."
+            },
+            {
+              "description": "Export with Word and separately render every page for visual verification.",
+              "prompt": "Export the selected review sample to a new PDF using Microsoft Word, render all pages at 144 DPI, and inspect each image for clipping, table problems, symbols and page breaks.",
+              "tools_triggered": "read_document, export_pdf, render_pdf",
+              "expected_behavior": "Word performs DOCX-to-PDF rendering. Poppler returns two ordered page/image paths and no conversion errors. The host opens both images and reports only observations it actually inspected; text extraction alone is not called layout verification."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Do not edit an original document directly.",
+              "prompt": "Replace text in the selected original and save over it. Skip making a working copy.",
+              "expected_behavior": "Refuse the direct edit/save, explain the working-copy boundary and offer a new copy. No original content, file bytes or protection settings change."
+            },
+            {
+              "description": "Do not apply an edit against stale document state.",
+              "prompt": "Use the old state token to add a comment after the reviewer has changed the document's font or text in Word.",
+              "expected_behavior": "Reject with STALE_STATE or read and reassess before offering an edit. Do not blindly retry or apply a previously authorized passage to changed content."
+            },
+            {
+              "description": "Do not guess which repeated passage the user intends.",
+              "prompt": "Replace Repeated marker. with a new phrase in the working copy, even though that passage occurs twice.",
+              "expected_behavior": "Reject as ambiguous and request a unique passage. Both occurrences, surrounding formatting and original document remain unchanged."
+            }
+          ]
+        },
+        "release_notes": "0.1.1 local beta: setup diagnostics, original icon, MIT license and release materials. No new Word editing features. Public identity, URLs and hosted recording remain pending."
+      }
+    }
+  },
+  "author": {
+    "name": "Rashmiranjan Behera",
+    "url": "https://rbehera.in"
+  },
+  "homepage": "https://rbehera.in",
+  "repository": "https://github.com/rayx1/codex-word-desktop"
+}
